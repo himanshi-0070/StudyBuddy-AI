@@ -1,0 +1,6 @@
+firebase_functions~=0.5.0
+pypdf>=4.0.0
+google-genai>=1.0.0
+python-dotenv>=1.0.0
+google-cloud-logging>=3.0.0
+google-cloud-firestore>=2.16.0

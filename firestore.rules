@@ -1,0 +1,128 @@
+rules_version='2'
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper: check if the requesting user is an admin
+    function isAdmin() {
+      return request.auth != null &&
+        get(/databases/$(database)/documents/user_profile/$(request.auth.uid)).data.type == 'admin';
+    }
+
+    // user_profile: each user can read and write only their own document
+    match /user_profile/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // user_plan: authenticated users can access their own, unauthenticated can create/read mapped by email
+    match /user_plan/{docId} {
+      allow read, write: if true;
+    }
+
+    // subjects: admins write, authenticated users read
+    match /subjects/{subjectId} {
+      allow read: if request.auth != null;
+      allow write: if isAdmin();
+    }
+
+    // study_material: admins write, authenticated users read
+    match /study_material/{docId} {
+      allow read: if request.auth != null;
+      allow write: if isAdmin();
+    }
+
+    // lecture_materials: admins write, authenticated users read
+    match /lecture_materials/{docId} {
+      allow read: if request.auth != null;
+      allow write: if isAdmin();
+    }
+
+    // models: admins write, authenticated users read
+    match /models/{useCase} {
+      allow read: if request.auth != null;
+      allow write: if isAdmin();
+    }
+
+    // doubt_solver_chat: users can read/write their own subject-specific history; admins can read/write all threads
+    match /doubt_solver_chat/{threadId} {
+      allow read: if request.auth != null &&
+        (isAdmin() || resource.data.userId == request.auth.uid);
+      allow create: if request.auth != null &&
+        request.resource.data.userId == request.auth.uid &&
+        request.resource.data.userEmail == request.auth.token.email &&
+        request.resource.data.subjectId is string &&
+        request.resource.data.messages is list;
+      allow update: if request.auth != null &&
+        (isAdmin() ||
+          (resource.data.userId == request.auth.uid &&
+           request.resource.data.userEmail == request.auth.token.email));
+      allow delete: if isAdmin();
+    }
+
+    // study_material_chunks: written by backend only; authenticated users read
+    match /study_material_chunks/{chunkId} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+
+    // syllabus: admins write (via callable function), authenticated users read
+    match /syllabus/{docId} {
+      allow read: if request.auth != null;
+      allow write: if isAdmin();
+    }
+
+    // practice_questions: written only by backend (Cloud Functions); any authenticated user can read
+    // questions (they are shared across all students of the same subject and class)
+    match /practice_questions/{questionId} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+
+    // solved_practice_questions: each user can read and write only their own attempt records
+    // Doc IDs are {uid}_{questionId} — written by the frontend after the user submits
+    match /solved_practice_questions/{attemptId} {
+      allow read: if request.auth != null && resource.data.uid == request.auth.uid;
+      allow create: if request.auth != null && request.resource.data.uid == request.auth.uid;
+      allow update: if request.auth != null && resource.data.uid == request.auth.uid;
+      allow delete: if false;
+    }
+
+    // lecture_progress: each user can read and write only their own progress records
+    // Doc IDs are {uid}_{lectureId}
+    match /lecture_progress/{progressId} {
+      allow read: if request.auth != null &&
+        (isAdmin() || resource.data.userId == request.auth.uid);
+      allow create: if request.auth != null &&
+        request.resource.data.userId == request.auth.uid;
+      allow update: if request.auth != null &&
+        resource.data.userId == request.auth.uid;
+      allow delete: if false;
+    }
+
+    // lecture_mcq_results: each user can read and write only their own quiz results
+    // Doc IDs are {uid}_{lectureId}_{timestamp}
+    match /lecture_mcq_results/{resultId} {
+      allow read: if request.auth != null &&
+        (isAdmin() || resource.data.userId == request.auth.uid);
+      allow create: if request.auth != null &&
+        request.resource.data.userId == request.auth.uid;
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    // dpp_attempts: written by Cloud Functions; each user can read only their own records
+    match /dpp_attempts/{attemptId} {
+      allow read: if request.auth != null &&
+        (isAdmin() || resource.data.userId == request.auth.uid);
+      allow create: if request.auth != null &&
+        request.resource.data.userId == request.auth.uid;
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    // Fallback: deny everything else
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

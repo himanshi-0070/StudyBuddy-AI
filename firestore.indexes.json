@@ -1,0 +1,137 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "practice_questions",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "subject", "order": "ASCENDING" },
+        { "fieldPath": "generatedAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "practice_questions",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "subject", "order": "ASCENDING" },
+        { "fieldPath": "class", "order": "ASCENDING" },
+        { "fieldPath": "generatedAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "solved_practice_questions",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "uid", "order": "ASCENDING" },
+        { "fieldPath": "subject", "order": "ASCENDING" },
+        { "fieldPath": "isCorrect", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "solved_practice_questions",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "uid", "order": "ASCENDING" },
+        { "fieldPath": "subject", "order": "ASCENDING" },
+        { "fieldPath": "class", "order": "ASCENDING" },
+        { "fieldPath": "isCorrect", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "study_material_chunks",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "subject", "order": "ASCENDING" },
+        { "fieldPath": "chunkIndex", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "study_material_chunks",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "subject", "order": "ASCENDING" },
+        { "fieldPath": "status", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "study_material_chunks",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "storagePath", "order": "ASCENDING" },
+        { "fieldPath": "chunkIndex", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "study_material_chunks",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "embedding", "vectorConfig": { "dimension": 1536, "flat": {} } }
+      ]
+    },
+    {
+      "collectionGroup": "study_material_chunks",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "subject", "order": "ASCENDING" },
+        { "fieldPath": "embedding", "vectorConfig": { "dimension": 1536, "flat": {} } }
+      ]
+    },
+    {
+      "collectionGroup": "study_material_chunks",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "class", "order": "ASCENDING" },
+        { "fieldPath": "embedding", "vectorConfig": { "dimension": 1536, "flat": {} } }
+      ]
+    },
+    {
+      "collectionGroup": "study_material_chunks",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "subject", "order": "ASCENDING" },
+        { "fieldPath": "class", "order": "ASCENDING" },
+        { "fieldPath": "embedding", "vectorConfig": { "dimension": 1536, "flat": {} } }
+      ]
+    },
+    {
+      "collectionGroup": "study_material_processing",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "storagePath", "order": "ASCENDING" },
+        { "fieldPath": "generation", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "dpp_attempts",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "completedAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "lecture_mcq_results",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "submittedAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "lecture_progress",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "completed", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "solved_practice_questions",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "uid", "order": "ASCENDING" },
+        { "fieldPath": "attemptedAt", "order": "DESCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

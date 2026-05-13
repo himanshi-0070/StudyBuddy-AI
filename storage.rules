@@ -1,0 +1,38 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // Study material PDFs — admins write, authenticated users read
+    match /study_material_bucket/{subject}/{fileName} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null
+        && firestore.get(
+          /databases/(default)/documents/user_profile/$(request.auth.uid)
+        ).data.type == 'admin';
+    }
+
+    // Lecture videos — admins write, authenticated users read
+    match /lecture_materials/{subject}/{fileName} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null
+        && firestore.get(
+          /databases/(default)/documents/user_profile/$(request.auth.uid)
+        ).data.type == 'admin';
+    }
+
+    // Syllabus PDFs — admins write, authenticated users read
+    match /syllabus_pdfs/{subject}/{class}/{fileName} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null
+        && firestore.get(
+          /databases/(default)/documents/user_profile/$(request.auth.uid)
+        ).data.type == 'admin';
+    }
+
+    // Fallback: deny everything else
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
