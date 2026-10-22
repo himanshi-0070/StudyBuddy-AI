@@ -264,7 +264,7 @@ function Onboarding() {
                       </label>
                       <select
                         value={course || ""}
-                        onChange={(e) => handleCourseChange(e.target.value || null)}
+                        onChange={(e) => handleCourseChange(e.target.value)}
                         className="w-full rounded-xl border border-border bg-surface px-4 py-3 text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary"
                       >
                         <option value="">Choose a course...</option>
