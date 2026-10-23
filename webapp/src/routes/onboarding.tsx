@@ -9,19 +9,13 @@ import {
   ArrowRight,
   Check,
   Sparkles,
-  Eye,
-  Ear,
-  MessageSquare,
   Languages,
-  UploadCloud,
-  FileText,
   Mail,
   User,
   GraduationCap,
   BookOpen,
-  Target,
 } from "lucide-react";
-import { STREAM_GOALS, BOARDS, DISABILITIES, ASSESSMENT_QUESTIONS, DEGREE_COURSES, COURSE_BRANCHES } from "@/lib/mock-data";
+import { STREAM_GOALS, BOARDS, DEGREE_COURSES, COURSE_BRANCHES } from "@/lib/mock-data";
 
 export const Route = createFileRoute("/onboarding")({
   component: Onboarding,
@@ -30,23 +24,6 @@ export const Route = createFileRoute("/onboarding")({
 const CLASSES = ["6", "7", "8", "9", "10", "11", "12", "Dropper", "UG", "PG"];
 const STREAMS = ["Science", "Commerce", "Arts"] as const;
 const LANGUAGES = ["English", "हिन्दी", "தமிழ்", "বাংলা", "मराठी", "తెలుగు"];
-
-const DISABILITY_ICONS: Record<string, typeof Eye> = {
-  none: Sparkles,
-  blind: Eye,
-  deaf: Ear,
-  mute: MessageSquare,
-};
-
-const STEPS = [
-  "Identity",
-  "Class",
-  "Board",
-  "Stream & Exams",
-  "Language",
-  "Accessibility",
-  "Ready",
-] as const;
 
 function Onboarding() {
   const { user } = useAuth();
@@ -76,7 +53,6 @@ function Onboarding() {
 
   // Prefs
   const [language, setLanguage] = useState("English");
-  const [disability, setDisability] = useState("none");
 
   const goalsForStream = useMemo(() => (stream ? STREAM_GOALS[stream] : []), [stream]);
 
@@ -106,7 +82,7 @@ function Onboarding() {
       baseSteps.push("Class", "Board", "Stream & Exams");
     }
     
-    baseSteps.push("Language", "Accessibility", "Ready");
+    baseSteps.push("Language", "Ready");
     return baseSteps;
   };
 
@@ -119,9 +95,8 @@ function Onboarding() {
     (step === 1 && !!klass && (!isDegreeProgram || !!course)) ||
     (step === 2 && (isDegreeProgram ? !!branch : !!board)) ||
     (step === 3 && (isDegreeProgram ? !!language : !!stream && goals.length > 0)) ||
-    (step === 4 && (isDegreeProgram ? !!disability : !!language)) ||
-    (step === 5 && (isDegreeProgram ? true : !!disability)) ||
-    step === (isDegreeProgram ? 6 : 7);
+    (step === 4 && !isDegreeProgram && !!language) ||
+    step === (isDegreeProgram ? 4 : 5);
 
   const handleClassChange = (newKlass: string) => {
     setKlass(newKlass);
@@ -158,7 +133,6 @@ function Onboarding() {
           stream,
           goals,
           language,
-          disability,
           updatedAt: serverTimestamp(),
         });
       }
@@ -427,74 +401,6 @@ function Onboarding() {
               )}
 
               {step === 4 && isDegreeProgram && (
-                <Pane
-                  title="Accessibility"
-                  subtitle="We'll enable subtitles, text-to-speech or text-only mode automatically."
-                >
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    {DISABILITIES.map((a) => {
-                      const Icon = DISABILITY_ICONS[a.id] ?? Sparkles;
-                      const active = disability === a.id;
-                      return (
-                        <button
-                          key={a.id}
-                          onClick={() => setDisability(a.id)}
-                          className={`flex items-center gap-4 rounded-2xl border p-4 text-left transition-all ${
-                            active
-                              ? "border-primary bg-surface ring-glow"
-                              : "border-border bg-surface hover:bg-surface-elevated"
-                          }`}
-                        >
-                          <div
-                            className={`grid h-11 w-11 place-items-center rounded-2xl ${
-                              active ? "bg-primary text-primary-foreground" : "bg-muted text-foreground"
-                            }`}
-                          >
-                            <Icon className="h-5 w-5" />
-                          </div>
-                          <p className="font-medium">{a.label}</p>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </Pane>
-              )}
-
-              {step === 5 && !isDegreeProgram && (
-                <Pane
-                  title="Accessibility"
-                  subtitle="We'll enable subtitles, text-to-speech or text-only mode automatically."
-                >
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    {DISABILITIES.map((a) => {
-                      const Icon = DISABILITY_ICONS[a.id] ?? Sparkles;
-                      const active = disability === a.id;
-                      return (
-                        <button
-                          key={a.id}
-                          onClick={() => setDisability(a.id)}
-                          className={`flex items-center gap-4 rounded-2xl border p-4 text-left transition-all ${
-                            active
-                              ? "border-primary bg-surface ring-glow"
-                              : "border-border bg-surface hover:bg-surface-elevated"
-                          }`}
-                        >
-                          <div
-                            className={`grid h-11 w-11 place-items-center rounded-2xl ${
-                              active ? "bg-primary text-primary-foreground" : "bg-muted text-foreground"
-                            }`}
-                          >
-                            <Icon className="h-5 w-5" />
-                          </div>
-                          <p className="font-medium">{a.label}</p>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </Pane>
-              )}
-
-              {step === 5 && isDegreeProgram && (
                 <Pane title="Your plan is ready" subtitle="We've built a personalised roadmap for your degree program.">
                   <div className="rounded-3xl border border-border bg-surface p-8">
                     <div className="grid gap-6 md:grid-cols-2">
@@ -504,10 +410,6 @@ function Onboarding() {
                       <Summary label="Course" value={DEGREE_COURSES[klass as "UG" | "PG"]?.find((c) => c.id === course)?.label ?? "—"} />
                       <Summary label="Specialization" value={branchesForCourse.find((b) => b.id === branch)?.label ?? "—"} />
                       <Summary label="Language" value={language} />
-                      <Summary
-                        label="Accessibility"
-                        value={DISABILITIES.find((a) => a.id === disability)?.label ?? "—"}
-                      />
                     </div>
                     <div className="mt-8 flex flex-wrap gap-3">
                       <button
@@ -527,7 +429,7 @@ function Onboarding() {
                 </Pane>
               )}
 
-              {step === 6 && !isDegreeProgram && (
+              {step === 5 && !isDegreeProgram && (
                 <Pane title="Your plan is ready" subtitle="We've built a personalised 18-month roadmap for you.">
                   <div className="rounded-3xl border border-border bg-surface p-8">
                     <div className="grid gap-6 md:grid-cols-2">
@@ -551,10 +453,6 @@ function Onboarding() {
                         }
                       />
                       <Summary label="Language" value={language} />
-                      <Summary
-                        label="Accessibility"
-                        value={DISABILITIES.find((a) => a.id === disability)?.label ?? "—"}
-                      />
                     </div>
                     <div className="mt-8 flex flex-wrap gap-3">
                       <button

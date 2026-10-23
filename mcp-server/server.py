@@ -11,7 +11,13 @@ load_dotenv()
 # MCP SERVER
 # --------------------------------------------------
 
-mcp = FastMCP("StudyBuddy MCP")
+mcp = FastMCP(
+    "StudyBuddy MCP",
+    host="0.0.0.0",
+    port=int(os.getenv("PORT", "8000")),
+    stateless_http=True,
+    json_response=True,
+)
 
 FIREBASE_GENERATE_DPP_URL = os.getenv(
     "FIREBASE_GENERATE_DPP_URL",
@@ -172,13 +178,59 @@ def navigate_to_feature(
     }
 
 
+# ==================================================
+# TOOL 3: SOLVE STUDENT DOUBT
+# ==================================================
+
+
+# --------------------------------------------------
+# TOOL 4: TALK WITH BUDDY (INTERACTIVE VOICE)
+# --------------------------------------------------
+
+@mcp.tool()
+def call_talk_with_buddy(doubt: str) -> dict:
+    """
+    ROUTING RULES:
+
+talk_with_buddy:
+Select when the student wants to clarify academic doubts
+interactively, through voice or conversational discussion.
+
+Examples:
+- I want to clear my Maths doubts interactively.
+- Let's discuss integration through voice.
+- I want Buddy to explain DBMS while talking with me.
+
+interview:
+Select ONLY when the student explicitly requests a mock
+interview, viva, or interview-style questioning.
+
+IMPORTANT:
+Interactive doubt clarification is talk_with_buddy,
+NOT interview.
+    """
+
+    doubt = doubt.strip()
+
+    if not doubt:
+        return {
+            "success": False,
+            "error": "A learning request is required.",
+        }
+
+    return {
+        "success": True,
+        "action": "talk_with_buddy",
+        "route": "/interview",
+        "query": doubt,
+        "reply": "Opening Talk with Buddy for an interactive session.",
+    }
+
+
 # --------------------------------------------------
 # START MCP SERVER
 # --------------------------------------------------
 
 if __name__ == "__main__":
-    print("Starting StudyBuddy MCP Server...")
-    print("Transport: Streamable HTTP")
-    print("Endpoint: http://127.0.0.1:8000/mcp")
-
+    print("Starting StudyBuddy MCP Server...", flush=True)
     mcp.run(transport="streamable-http")
