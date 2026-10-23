@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { consumeAgentQuiz } from "@/lib/agentQuiz";
 import { useMemo, useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Timer, Loader2, AlertTriangle, CheckCircle2, XCircle, RotateCcw } from "lucide-react";
@@ -30,8 +31,9 @@ type MCQQuestion = {
 const OPTION_LABELS = ["A", "B", "C", "D"] as const;
 
 function Practice() {
+  const [incomingQuiz] = useState(() => consumeAgentQuiz());
   const [subjects, setSubjects] = useState<Subject[]>([]);
-  const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
+  const [selectedSubject, setSelectedSubject] = useState<string | null>(incomingQuiz?.subject ?? null);
   const [questions, setQuestions] = useState<MCQQuestion[]>([]);
   const [level, setLevel] = useState<string>("");
   const [explanation, setExplanation] = useState<string>("");
@@ -76,9 +78,12 @@ function Practice() {
           });
         }
         subjectList.sort((a, b) => a.name.localeCompare(b.name));
+        if (incomingQuiz && !subjectList.some((s) => s.name === incomingQuiz.subject)) {
+          subjectList.push({ id: incomingQuiz.subject.toLowerCase().replace(/\s+/g, "_"), name: incomingQuiz.subject, class: incomingQuiz.className });
+        }
         setSubjects(subjectList);
         if (subjectList.length > 0) {
-          setSelectedSubject(subjectList[0].name);
+          setSelectedSubject((current) => current ?? subjectList[0].name);
         }
       } catch (err) {
         console.error("Failed to fetch subjects:", err);
@@ -88,12 +93,22 @@ function Practice() {
       }
     };
     fetchSubjects();
-  }, []);
+  }, [incomingQuiz]);
 
   // Load existing questions from Firestore when subject changes,
   // excluding questions the user has already answered correctly
   useEffect(() => {
     if (!activeSubject) return;
+    if (incomingQuiz && incomingQuiz.subject === activeSubject.name && (!incomingQuiz.className || incomingQuiz.className === activeSubject.class)) {
+      setQuestions(incomingQuiz.questions);
+      setLevel(incomingQuiz.level);
+      setExplanation(incomingQuiz.explanation);
+      setSelectedAnswers({});
+      setSubmitted(false);
+      setError(null);
+      setIsLoadingExisting(false);
+      return;
+    }
     const loadExisting = async () => {
       setIsLoadingExisting(true);
       setQuestions([]);
@@ -159,7 +174,7 @@ function Practice() {
       }
     };
     loadExisting();
-  }, [activeSubject?.name, activeSubject?.class]);
+  }, [activeSubject?.name, activeSubject?.class, incomingQuiz]);
 
   const hasQuestions = questions.length > 0;
 

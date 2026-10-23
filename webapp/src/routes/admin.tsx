@@ -21,7 +21,7 @@ import { AppHeader } from "@/components/app-header";
 import { COURSES } from "@/lib/mock-data";
 import { useAuth } from "@/context/AuthContext";
 import { db, storage, functions } from "@/firebase";
-import { ref, uploadBytesResumable } from "firebase/storage";
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import {
   collection,
   addDoc,
