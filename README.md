@@ -137,23 +137,7 @@ It is a **simulation**, not a production Alexa+ integration. This project does *
 
 ### Conceptual architecture
 
-```mermaid
-flowchart LR
-    S[Student] --> B[Buddy chatbot<br/>React + TypeScript]
-    B --> N[FastAPI<br/>/agent/chat]
-    N --> G[Gemini navigation agent]
-    G --> R[reply + action + original query]
-    R --> B
-    B --> T[TanStack Router]
-    T --> D[Doubt Solver / Practice / Interview route]
-    D --> F[Firebase Auth + Firestore + callable Functions]
-
-    C[MCP client<br/>check_protocol.py or test_alexa_client.py] -->|Streamable HTTP| M[FastMCP server<br/>127.0.0.1:8000/mcp]
-    M --> Q[generate_quiz]
-    M --> V[navigate_to_feature]
-    Q --> F
-    V --> O[Structured route/query result]
-```
+<img>
 
 ### MCP client, model, and server are different things
 
